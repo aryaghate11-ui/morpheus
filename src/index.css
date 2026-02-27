@@ -1,0 +1,277 @@
+@import url('https://fonts.googleapis.com/css2?family=Domine:wght@400..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3a8b6e;
+  /* Deep Emerald */
+  --color-secondary: #5DA392;
+  /* Muted Sage */
+  --color-bg-light: #F4FAF6;
+  /* Very light mint */
+  --font-sans: "Domine", serif;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-slate-700 font-sans min-h-screen;
+    background: radial-gradient(circle at center, #ffffff 20%, #064e3b 100%);
+    background-attachment: fixed;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    background-image: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .glass-card {
+    border: 1px solid #eee !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-sm rounded-lg;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.wallet-card {
+  @apply text-white border-none shadow-xl rounded-2xl relative overflow-hidden;
+  background: linear-gradient(135deg, #1a3c34 0%, #2d6b5a 30%, #3a8b7a 55%, #1f5c4d 80%, #0f3d32 100%);
+  aspect-ratio: 1.586 / 1;
+  box-shadow: 0 20px 60px rgba(15, 61, 50, 0.4), 0 0 40px rgba(45, 107, 90, 0.15) inset;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wallet-card:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 28px 70px rgba(15, 61, 50, 0.5), 0 0 50px rgba(45, 107, 90, 0.25) inset, 0 0 20px rgba(93, 163, 146, 0.2);
+}
+
+.wallet-card:hover::after {
+  animation: shimmer 8s ease-in-out infinite, shine-sweep 0.6s ease-out;
+}
+
+@keyframes shine-sweep {
+  0% {
+    opacity: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0.2) 55%, transparent 70%);
+    transform: translateX(-100%);
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0.2) 55%, transparent 70%);
+    transform: translateX(100%);
+  }
+}
+
+.wallet-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(255, 255, 255, 0.3) 18px, rgba(255, 255, 255, 0.3) 19px),
+    repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(255, 255, 255, 0.3) 18px, rgba(255, 255, 255, 0.3) 19px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wallet-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent 42%,
+      rgba(255, 255, 255, 0.03) 43%,
+      rgba(255, 255, 255, 0.08) 46%,
+      rgba(255, 255, 255, 0.03) 49%,
+      transparent 50%);
+  pointer-events: none;
+  z-index: 2;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+
+  0%,
+  100% {
+    transform: translateX(-30%) translateY(-30%) rotate(0deg);
+  }
+
+  50% {
+    transform: translateX(30%) translateY(30%) rotate(0deg);
+  }
+}
+
+.card-chip {
+  @apply w-12 h-9 rounded-md relative overflow-hidden;
+  background: linear-gradient(135deg, #e8d282 0%, #c9a43c 40%, #f0d861 60%, #b8922e 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 4px rgba(201, 164, 60, 0.4) inset;
+}
+
+.card-chip::after {
+  content: '';
+  @apply absolute inset-0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background-image:
+    linear-gradient(90deg, transparent 20%, rgba(0, 0, 0, 0.08) 21%, rgba(0, 0, 0, 0.08) 25%, transparent 26%, transparent 45%, rgba(0, 0, 0, 0.08) 46%, rgba(0, 0, 0, 0.08) 50%, transparent 51%),
+    linear-gradient(0deg, transparent 40%, rgba(0, 0, 0, 0.06) 41%, rgba(0, 0, 0, 0.06) 45%, transparent 46%);
+}
+
+/* ============ DARK MODE ============ */
+.dark body,
+body.dark {
+  background: radial-gradient(circle at center, #1c1f21 20%, #111314 100%) !important;
+  background-attachment: fixed;
+  color: #d4d8db;
+}
+
+.dark .glass-card {
+  background: rgba(42, 45, 48, 0.88) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.dark .glass-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Header */
+.dark header {
+  background: rgba(28, 31, 33, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Bottom Nav */
+.dark nav {
+  background: rgba(28, 31, 33, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Side Menu */
+.dark .side-menu {
+  background: #22262a !important;
+}
+
+/* Text overrides */
+.dark .text-slate-900,
+.dark .text-slate-800 {
+  color: #e8eaec !important;
+}
+
+.dark .text-slate-700 {
+  color: #cdd0d4 !important;
+}
+
+.dark .text-slate-600 {
+  color: #a8adb3 !important;
+}
+
+.dark .text-slate-500 {
+  color: #8b9198 !important;
+}
+
+.dark .text-slate-400 {
+  color: #6b7280 !important;
+}
+
+/* Background overrides */
+.dark .bg-white,
+.dark .bg-white\/80,
+.dark .bg-white\/70,
+.dark .bg-white\/75 {
+  background-color: rgba(42, 45, 48, 0.88) !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: rgba(38, 41, 44, 0.7) !important;
+}
+
+.dark .bg-emerald-50,
+.dark .bg-emerald-50\/50 {
+  background-color: rgba(58, 139, 110, 0.1) !important;
+}
+
+/* Border overrides */
+.dark .border-slate-100,
+.dark .border-slate-100\/50,
+.dark .border-white\/20,
+.dark .border-white\/40,
+.dark .border-slate-50,
+.dark .border-emerald-100,
+.dark .border-emerald-100\/50 {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Input fields */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: rgba(30, 33, 36, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #d4d8db !important;
+}
+
+.dark input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Hover states */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .hover\:bg-emerald-100:hover {
+  background-color: rgba(58, 139, 110, 0.15) !important;
+}
+
+/* Divide */
+.dark .divide-slate-50> :not([hidden])~ :not([hidden]),
+.dark .divide-slate-100> :not([hidden])~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Recharts — fix label colors */
+.dark .recharts-text {
+  fill: #8b9198 !important;
+}
+
+/* Modal backdrop */
+.dark .bg-slate-900\/50 {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Menu button */
+.dark .bg-emerald-50 {
+  background-color: rgba(58, 139, 110, 0.12) !important;
+}
