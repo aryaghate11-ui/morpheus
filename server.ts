@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import Database from "better-sqlite3";
 import path from "path";
@@ -122,8 +123,13 @@ function seedInsurance(email: string, persona?: string) {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
 
+  // CORS — allow Vercel frontend
+  app.use(cors({
+    origin: process.env.FRONTEND_URL || '*',
+    credentials: true
+  }));
   app.use(express.json());
 
   // API Routes — all user-scoped
@@ -275,7 +281,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`\n  ➜  Local:   \x1b[36mhttp://localhost:${PORT}/\x1b[0m`);
     console.log(`  ➜  Network: \x1b[2mhttp://0.0.0.0:${PORT}/\x1b[0m\n`);
   });

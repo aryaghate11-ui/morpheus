@@ -66,6 +66,9 @@ interface WalletData {
   breakdown: { platform: string; amount: number }[];
 }
 
+// API base URL — empty for local dev, Railway URL for production
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 // --- Components ---
 
 // Map insurance type to icon
@@ -653,7 +656,7 @@ const Onboarding = ({ onComplete }: { onComplete: (data: any) => void }) => {
 
                     if (isLoginMode) {
                       try {
-                        const res = await fetch('/api/login', {
+                        const res = await fetch(API_BASE + '/api/login', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ phone })
@@ -797,7 +800,7 @@ const Onboarding = ({ onComplete }: { onComplete: (data: any) => void }) => {
                   onClick={async () => {
                     setLoginError('');
                     try {
-                      const res = await fetch('/api/onboard', {
+                      const res = await fetch(API_BASE + '/api/onboard', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, phone, email, password, persona, language: lang })
@@ -868,7 +871,7 @@ const Onboarding = ({ onComplete }: { onComplete: (data: any) => void }) => {
                   onClick={async () => {
                     setLoginError('');
                     try {
-                      const res = await fetch('/api/login', {
+                      const res = await fetch(API_BASE + '/api/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, password })
@@ -938,9 +941,9 @@ const Dashboard = ({ user, lang, onLogout }: { user: any, lang: Language, onLogo
   const fetchData = async () => {
     try {
       const [wRes, tRes, iRes] = await Promise.all([
-        fetch(`/api/wallet?email=${encodeURIComponent(user.email)}`),
-        fetch(`/api/transactions?email=${encodeURIComponent(user.email)}`),
-        fetch(`/api/insurance?email=${encodeURIComponent(user.email)}`)
+        fetch(`${API_BASE}/api/wallet?email=${encodeURIComponent(user.email)}`),
+        fetch(`${API_BASE}/api/transactions?email=${encodeURIComponent(user.email)}`),
+        fetch(`${API_BASE}/api/insurance?email=${encodeURIComponent(user.email)}`)
       ]);
       const wData = await wRes.json();
       const tData = await tRes.json();
@@ -992,7 +995,7 @@ const Dashboard = ({ user, lang, onLogout }: { user: any, lang: Language, onLogo
 
   useEffect(() => {
     // Start simulation for this user
-    fetch('/api/start-sim', {
+    fetch(API_BASE + '/api/start-sim', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: user.email })
@@ -1004,7 +1007,7 @@ const Dashboard = ({ user, lang, onLogout }: { user: any, lang: Language, onLogo
     return () => {
       clearInterval(interval);
       // Stop simulation on unmount (logout)
-      fetch('/api/stop-sim', {
+      fetch(API_BASE + '/api/stop-sim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email })
@@ -1587,7 +1590,7 @@ const Dashboard = ({ user, lang, onLogout }: { user: any, lang: Language, onLogo
                               window.open(ins.link, '_blank');
                               const nextDue = new Date(ins.nextDue);
                               nextDue.setMonth(nextDue.getMonth() + 1);
-                              await fetch('/api/insurance/update', {
+                              await fetch(API_BASE + '/api/insurance/update', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ id: ins.id, status: 'active', nextDue: nextDue.toISOString().split('T')[0] })
