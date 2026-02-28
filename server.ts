@@ -7,10 +7,10 @@ import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 import "dotenv/config";
 
-// Initialize Supabase
+// Initialize Supabase (optional — server works without it using SQLite only)
 const supabaseUrl = process.env.SUPABASE_URL || "";
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = supabaseUrl ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const db = new Database("gigos.db");
 
@@ -198,33 +198,37 @@ async function startServer() {
         db.prepare("UPDATE user_profile SET user_id = ? WHERE email = ?").run(uid, email);
         user.user_id = uid;
         // Sync to Supabase
-        try {
-          await supabase.from('profiles').update({ user_id: uid }).eq('email', email);
-          console.log(`[Supabase] Backfilled user_id for ${email}: ${uid}`);
-        } catch (e) { console.error('[Supabase] Backfill error:', e); }
+        if (supabase) {
+          try {
+            await supabase.from('profiles').update({ user_id: uid }).eq('email', email);
+            console.log(`[Supabase] Backfilled user_id for ${email}: ${uid}`);
+          } catch (e) { console.error('[Supabase] Backfill error:', e); }
+        }
       }
       return res.json({ success: true, user: { user_id: user.user_id, name: user.name, phone: user.phone, email: user.email, persona: user.persona, lang: user.language } });
     }
 
     // Fallback to Supabase
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('email', email)
-        .eq('password', password)
-        .single();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('email', email)
+          .eq('password', password)
+          .single();
 
-      if (data) {
-        const uid = (data as any).user_id || crypto.randomUUID();
-        db.prepare("INSERT OR IGNORE INTO user_profile (user_id, name, phone, email, password, persona, language) VALUES (?, ?, ?, ?, ?, ?, ?)").run(uid, data.full_name, data.phone, data.email, data.password, data.persona, data.language || 'en');
-        return res.json({
-          success: true,
-          user: { user_id: uid, name: data.full_name, phone: data.phone, email: data.email, persona: data.persona, lang: data.language || 'en' }
-        });
+        if (data) {
+          const uid = (data as any).user_id || crypto.randomUUID();
+          db.prepare("INSERT OR IGNORE INTO user_profile (user_id, name, phone, email, password, persona, language) VALUES (?, ?, ?, ?, ?, ?, ?)").run(uid, data.full_name, data.phone, data.email, data.password, data.persona, data.language || 'en');
+          return res.json({
+            success: true,
+            user: { user_id: uid, name: data.full_name, phone: data.phone, email: data.email, persona: data.persona, lang: data.language || 'en' }
+          });
+        }
+      } catch (err) {
+        console.error("[Supabase Login Error]", err);
       }
-    } catch (err) {
-      console.error("[Supabase Login Error]", err);
     }
 
     return res.status(401).json({ success: false, message: "Invalid email or password." });
@@ -245,23 +249,25 @@ async function startServer() {
     }
 
     // Sync with Supabase
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: userId,
-          phone,
-          full_name: name,
-          email,
-          password,
-          persona,
-          language
-        }, { onConflict: 'phone' });
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: userId,
+            phone,
+            full_name: name,
+            email,
+            password,
+            persona,
+            language
+          }, { onConflict: 'phone' });
 
-      if (error) throw error;
-      console.log(`[Supabase] Profile synced for ${name} (${email})`);
-    } catch (err) {
-      console.error("[Supabase Error]", err);
+        if (error) throw error;
+        console.log(`[Supabase] Profile synced for ${name} (${email})`);
+      } catch (err) {
+        console.error("[Supabase Error]", err);
+      }
     }
 
     res.json({ success: true, userId });
