@@ -5,7 +5,11 @@ import Database from "better-sqlite3";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import { fileURLToPath } from 'url';
 import "dotenv/config";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Supabase (optional — server works without it using SQLite only)
 const supabaseUrl = process.env.SUPABASE_URL || "";
